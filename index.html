@@ -5,46 +5,52 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Painel de Ferramentas CTO</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        /* Esquema de cores: 3 cores design - Azul primário (#007BFF), Verde secundário (#28A745), Cinza neutro (#6C757D) */
+        /* Esquema de cores atualizado: Roxo-azul moderno - Primário (#6366F1), Secundário (#10B981), Acento (#6B7280) */
         :root {
-            --primary-color: #007BFF;
-            --secondary-color: #28A745;
-            --accent-color: #6C757D;
-            --bg-color: #F8F9FA;
-            --text-color: #212529;
+            --primary-color: #6366F1;
+            --secondary-color: #10B981;
+            --accent-color: #6B7280;
+            --bg-color: #F9FAFB;
+            --text-color: #111827;
             --white: #FFFFFF;
+            --shadow-light: rgba(99, 102, 241, 0.1);
+            --shadow-medium: rgba(99, 102, 241, 0.2);
+            --gradient-primary: linear-gradient(135deg, #6366F1, #8B5CF6);
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, var(--bg-color) 0%, #E9ECEF 100%);
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, var(--bg-color) 0%, #E5E7EB 100%);
             margin: 0;
             padding: 20px;
             color: var(--text-color);
             line-height: 1.6;
+            overflow-x: hidden;
         }
 
         .container {
             max-width: 800px;
             margin: 0 auto;
             background: var(--white);
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            border-radius: 20px;
+            box-shadow: 0 20px 60px var(--shadow-light);
             overflow: hidden;
-            animation: fadeIn 0.8s ease-out;
+            animation: slideUp 1s ease-out;
+            position: relative;
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(50px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
         header {
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            background: var(--gradient-primary);
             color: var(--white);
             text-align: center;
-            padding: 30px;
+            padding: 40px 30px;
             position: relative;
             overflow: hidden;
         }
@@ -56,20 +62,25 @@
             left: -50%;
             width: 200%;
             height: 200%;
-            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="white" opacity="0.1"/><circle cx="75" cy="75" r="1" fill="white" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>') repeat;
-            animation: sparkle 2s linear infinite;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="white" opacity="0.05"/><circle cx="75" cy="75" r="1" fill="white" opacity="0.05"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>') repeat;
+            animation: sparkle 3s linear infinite;
+            opacity: 0.3;
         }
 
         @keyframes sparkle {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            0% { transform: rotate(0deg) scale(1); }
+            50% { transform: rotate(180deg) scale(1.1); }
+            100% { transform: rotate(360deg) scale(1); }
         }
 
         header h1 {
             margin: 0;
-            font-size: 2.5em;
-            font-weight: 300;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            font-size: 2.8em;
+            font-weight: 700;
+            text-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            letter-spacing: -0.5px;
+            position: relative;
+            z-index: 1;
         }
 
         main {
@@ -79,31 +90,50 @@
         .button-group {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
+            gap: 25px;
             margin-bottom: 30px;
         }
 
         .btn {
             display: block;
             width: 90%;
-            padding: 15px 20px;
+            padding: 18px 24px;
             background: var(--primary-color);
             color: var(--white);
             text-decoration: none;
             text-align: center;
-            border-radius: 10px;
+            border-radius: 16px;
             font-size: 1.1em;
             font-weight: 500;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 4px 15px rgba(0, 123, 255, 0.3);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 8px 25px var(--shadow-medium);
             position: relative;
             overflow: hidden;
+            animation: fadeInUp 0.8s ease-out forwards;
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        .btn:nth-child(1) { animation-delay: 0.1s; }
+        .btn:nth-child(2) { animation-delay: 0.2s; }
+        .btn:nth-child(3) { animation-delay: 0.3s; }
+        .btn:nth-child(4) { animation-delay: 0.4s; }
+        .btn:nth-child(5) { animation-delay: 0.5s; }
+        .btn:nth-child(6) { animation-delay: 0.6s; }
+        .btn:nth-child(7) { animation-delay: 0.7s; }
+        .btn:nth-child(8) { animation-delay: 0.8s; }
+
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .btn:hover {
-            transform: translateY(-3px) scale(1.02);
-            box-shadow: 0 8px 25px rgba(0, 123, 255, 0.4);
-            background: #0056b3;
+            transform: translateY(-5px) scale(1.03);
+            box-shadow: 0 15px 40px var(--shadow-light);
+            background: #5856EB;
         }
 
         .btn::before {
@@ -113,8 +143,8 @@
             left: -100%;
             width: 100%;
             height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-            transition: left 0.5s;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.6s;
         }
 
         .btn:hover::before {
@@ -123,22 +153,22 @@
 
         .btn-secondary {
             background: var(--secondary-color);
-            box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+            box-shadow: 0 8px 25px rgba(16, 185, 129, 0.2);
         }
 
         .btn-secondary:hover {
-            background: #1E7E34;
-            box-shadow: 0 8px 25px rgba(40, 167, 69, 0.4);
+            background: #059669;
+            box-shadow: 0 15px 40px rgba(16, 185, 129, 0.3);
         }
 
         .btn-accent {
             background: var(--accent-color);
-            box-shadow: 0 4px 15px rgba(108, 117, 127, 0.3);
+            box-shadow: 0 8px 25px rgba(107, 114, 128, 0.2);
         }
 
         .btn-accent:hover {
-            background: #545B62;
-            box-shadow: 0 8px 25px rgba(108, 117, 127, 0.4);
+            background: #4B5563;
+            box-shadow: 0 15px 40px rgba(107, 114, 128, 0.3);
         }
 
         /* Botão especial para mapas com 3 ícones - Sempre horizontal */
@@ -146,55 +176,46 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
-            padding: 15px;
-            flex-wrap: wrap; /* Permite quebra se necessário em telas muito pequenas */
+            gap: 12px;
+            padding: 18px;
+            flex-wrap: wrap;
         }
 
         .map-icon {
-            width: 60px;
-            height: 60px;
+            width: 65px;
+            height: 65px;
             border-radius: 50%;
             background: var(--white);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.5em;
+            font-size: 1.6em;
             color: var(--primary-color);
-            transition: all 0.3s ease;
+            transition: all 0.4s ease;
             cursor: pointer;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 6px 20px var(--shadow-light);
             position: relative;
+            animation: pulse 2s infinite;
+        }
+
+        .map-icon:nth-child(1) { animation-delay: 0.5s; }
+        .map-icon:nth-child(2) { animation-delay: 1s; }
+        .map-icon:nth-child(3) { animation-delay: 1.5s; }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); box-shadow: 0 6px 20px var(--shadow-light); }
+            50% { transform: scale(1.05); box-shadow: 0 8px 25px var(--shadow-medium); }
         }
 
         .map-icon:hover {
-            transform: scale(1.1) rotate(5deg);
-            box-shadow: 0 6px 20px rgba(0, 123, 255, 0.3);
+            transform: scale(1.15) rotate(10deg);
+            box-shadow: 0 10px 30px var(--shadow-medium);
             color: var(--secondary-color);
         }
 
         .map-icon a {
             color: inherit;
             text-decoration: none;
-        }
-
-        /* Seção QR Code */
-        .qr-section {
-            text-align: center;
-            margin-top: 20px;
-        }
-
-        .qr-image {
-            width: 200px;
-            height: 200px;
-            border-radius: 10px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s ease;
-            cursor: pointer;
-        }
-
-        .qr-image:hover {
-            transform: scale(1.05);
         }
 
         /* Modal para QR Code Full Screen */
@@ -207,8 +228,9 @@
             width: 100%;
             height: 100%;
             overflow: auto;
-            background-color: rgba(0, 0, 0, 0.9);
-            animation: fadeIn 0.3s ease-out;
+            background-color: rgba(0, 0, 0, 0.85);
+            animation: fadeIn 0.4s ease-out;
+            backdrop-filter: blur(5px);
         }
 
         .modal-content {
@@ -219,91 +241,198 @@
             max-height: 90%;
             object-fit: contain;
             padding: 20px;
+            animation: zoomIn 0.4s ease-out;
+        }
+
+        @keyframes zoomIn {
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
         }
 
         .close {
             position: absolute;
-            top: 15px;
-            right: 35px;
+            top: 20px;
+            right: 40px;
             color: #f1f1f1;
-            font-size: 40px;
-            font-weight: bold;
+            font-size: 45px;
+            font-weight: 700;
             cursor: pointer;
             z-index: 1001;
-            transition: color 0.3s ease;
+            transition: all 0.3s ease;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
         }
 
         .close:hover {
             color: var(--primary-color);
+            transform: scale(1.1);
         }
 
-        /* Responsividade */
+        /* Estilos para iframe no modal */
+        .iframe-content {
+            width: 100%;
+            height: 80vh;
+            max-width: 100%;
+            border: none;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        /* Botão OOKLA no modal de speed test */
+        .ookla-button {
+            display: block;
+            width: 94%;
+            margin-top: 15px;
+            padding: 14px 20px;
+            background: var(--secondary-color);
+            color: var(--white);
+            text-decoration: none;
+            text-align: center;
+            border-radius: 12px;
+            font-size: 1em;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.2);
+        }
+
+        .ookla-button:hover {
+            background: #059669;
+            box-shadow: 0 10px 30px rgba(16, 185, 129, 0.3);
+            transform: translateY(-2px);
+        }
+
+        /* Botão similar para IndaiaFibra no modal */
+        .indaia-external-button {
+            display: block;
+            width: 94%;
+            margin-top: 15px;
+            padding: 14px 20px;
+            background: var(--primary-color);
+            color: var(--white);
+            text-decoration: none;
+            text-align: center;
+            border-radius: 12px;
+            font-size: 1em;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            box-shadow: 0 6px 20px var(--shadow-medium);
+        }
+
+        .indaia-external-button:hover {
+            background: #5856EB;
+            box-shadow: 0 10px 30px var(--shadow-light);
+            transform: translateY(-2px);
+        }
+
+        /* Seção de info de IP/Geo no modal de speedtest */
+        #ip-geo-info {
+            text-align: center;
+            padding: 18px;
+            background: linear-gradient(135deg, #F0F9FF, #E0F2FE);
+            border-radius: 12px;
+            margin-bottom: 15px;
+            font-size: 0.95em;
+            color: var(--text-color);
+            border: 1px solid #B6E4FF;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.1);
+        }
+
+        #ip-geo-info p {
+            margin: 6px 0;
+            font-weight: 500;
+        }
+
+        #ip-geo-info.loading p {
+            color: var(--accent-color);
+        }
+
         @media (max-width: 768px) {
             body {
                 padding: 10px;
             }
 
             header {
-                padding: 20px;
+                padding: 30px 20px;
             }
 
             header h1 {
-                font-size: 2em;
+                font-size: 2.2em;
             }
 
             main {
-                padding: 20px;
+                padding: 25px;
             }
 
             .button-group {
                 grid-template-columns: 1fr;
-                gap: 15px;
+                gap: 18px;
             }
 
-            /* Ícones do mapa sempre lado a lado, mas menores em mobile */
             .map-bundle {
-                gap: 8px;
-                padding: 10px;
+                gap: 10px;
+                padding: 15px;
+            }
+
+            .map-icon {
+                width: 55px;
+                height: 55px;
+                font-size: 1.4em;
+            }
+
+            .close {
+                top: 15px;
+                right: 25px;
+                font-size: 35px;
+            }
+
+            .iframe-content {
+                height: 70vh;
+            }
+
+            .ookla-button, .indaia-external-button {
+                margin-top: 12px;
+                padding: 12px 16px;
+                font-size: 0.95em;
+            }
+
+            #ip-geo-info {
+                font-size: 0.9em;
+                padding: 15px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            header h1 {
+                font-size: 2em;
             }
 
             .map-icon {
                 width: 50px;
                 height: 50px;
-                font-size: 1.2em;
-            }
-
-            .qr-image {
-                width: 150px;
-                height: 150px;
-            }
-
-            .close {
-                top: 10px;
-                right: 20px;
-                font-size: 30px;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .map-icon {
-                width: 45px;
-                height: 45px;
-                font-size: 1.1em;
-            }
-
-            .qr-image {
-                width: 120px;
-                height: 120px;
+                font-size: 1.3em;
             }
 
             .modal-content {
                 width: 95%;
-                padding: 10px;
+                padding: 15px;
             }
 
             .map-bundle {
-                gap: 5px;
-                justify-content: space-around; /* Distribui melhor em telas muito pequenas */
+                gap: 8px;
+                justify-content: space-around;
+            }
+
+            .iframe-content {
+                height: 65vh;
+            }
+
+            .ookla-button, .indaia-external-button {
+                padding: 10px 14px;
+                font-size: 0.9em;
+            }
+
+            #ip-geo-info {
+                font-size: 0.85em;
+                padding: 12px;
             }
         }
     </style>
@@ -315,8 +444,8 @@
         </header>
         <main>
             <div class="button-group">
-                <!-- Botões individuais -->
-                <a href="https://gchat.indaiafibra.com.br/#/login" target="_blank" class="btn">
+                <!-- Botão IndaiaFibra - Agora abre em modal -->
+                <a href="#" id="indaiaBtn" class="btn" onclick="openIndaiaModal()">
                     <i class="fas fa-network-wired"></i> Sistema IndaiaFibra
                 </a>
 
@@ -326,6 +455,11 @@
 
                 <a href="https://check-host.net/" target="_blank" class="btn">
                     <i class="fas fa-search"></i> Host Check
+                </a>
+
+                <!-- Botão para Gerenciar Host (detecta gateway dinamicamente) -->
+                <a href="#" id="hostBtn" class="btn btn-accent" target="_blank">
+                    <i class="fas fa-desktop"></i> Gerenciando Host...
                 </a>
 
                 <!-- Botão BGP -->
@@ -355,16 +489,15 @@
                     </div>
                 </div>
 
-                <!-- Botão para Speed Teste (agora abre em nova aba, pois iframe é bloqueado pelo site) -->
-                <a href="https://speed.unifique.com.br/" target="_blank" class="btn btn-accent">
+                <!-- Botão para Speed Teste - Agora abre em modal -->
+                <a href="#" id="speedtestBtn" class="btn" onclick="openSpeedtestModal()">
                     <i class="fas fa-tachometer-alt"></i> Speed Teste
                 </a>
-            </div>
 
-            <!-- Seção QR Code - Com a imagem qr.jpg integrada -->
-            <div class="qr-section">
-                <h3><i class="fas fa-qrcode"></i> QR Code</h3>
-                <img src="qr.jpg" alt="QR Code" class="qr-image" id="qrImage" onclick="openModal()">
+                <!-- Botão para QR Code - Abre em modal -->
+                <a href="#" id="qrBtn" class="btn btn-secondary" onclick="openModal()">
+                    <i class="fas fa-qrcode"></i> QR Code
+                </a>
             </div>
         </main>
     </div>
@@ -375,7 +508,103 @@
         <img class="modal-content" id="modalImg" src="qr.jpg" alt="QR Code Full Screen">
     </div>
 
+    <!-- Modal para Speed Test -->
+    <div id="speedtestModal" class="modal">
+        <span class="close" onclick="closeSpeedtestModal()">&times;</span>
+        <div class="modal-content">
+            <div id="ip-geo-info" class="loading">
+                <p><strong>Carregando informações de rede...</strong></p>
+            </div>
+            <iframe class="iframe-content" src="https://fast.com/" title="Speed Test"></iframe>
+            <a href="https://www.speedtest.net/pt" target="_blank" class="ookla-button">
+                <i class="fas fa-external-link-alt"></i> Abrir no OOKLA
+            </a>
+        </div>
+    </div>
+
+    <!-- Modal para IndaiaFibra -->
+    <div id="indaiaModal" class="modal">
+        <span class="close" onclick="closeIndaiaModal()">&times;</span>
+        <div class="modal-content">
+            <iframe class="iframe-content" src="https://gchat.indaiafibra.com.br/#/login" title="Sistema IndaiaFibra"></iframe>
+            <a href="https://gchat.indaiafibra.com.br/#/login" target="_blank" class="indaia-external-button">
+                <i class="fas fa-external-link-alt"></i> Abrir Externamente
+            </a>
+        </div>
+    </div>
+
     <script>
+        // Função assíncrona para obter o IP local privado via WebRTC
+        async function getLocalIP() {
+            return new Promise((resolve) => {
+                const conn = new RTCPeerConnection({ iceServers: [] });
+                conn.createDataChannel('');
+                conn.createOffer()
+                    .then(offer => conn.setLocalDescription(offer))
+                    .catch(() => resolve(null));
+                let timeout = setTimeout(() => {
+                    conn.close();
+                    resolve(null);
+                }, 5000);
+
+                conn.onicecandidate = (ice) => {
+                    if (ice && ice.candidate && ice.candidate.candidate) {
+                        const candidate = ice.candidate.candidate;
+                        const ipMatch = candidate.match(/([0-9]{1,3}(\.[0-9]{1,3}){3})/);
+                        if (ipMatch) {
+                            const ip = ipMatch[1];
+                            // Verifica se é IP privado
+                            if (ip.startsWith('192.168.') || ip.startsWith('10.') || ip.match(/^172\.(1[6-9]|2[0-9]|3[01])\./)) {
+                                clearTimeout(timeout);
+                                conn.close();
+                                resolve(ip);
+                                return;
+                            }
+                        }
+                    }
+                };
+            });
+        }
+
+        // Função para carregar IP WAN, IPv6 e Geolocalização
+        async function fetchIpInfo() {
+            const infoDiv = document.getElementById('ip-geo-info');
+            try {
+                infoDiv.innerHTML = '<p><strong>Carregando informações de rede...</strong></p>';
+                infoDiv.classList.add('loading');
+
+                // IPv4
+                const ipv4Response = await fetch('https://api.ipify.org?format=json');
+                const ipv4Data = await ipv4Response.json();
+                const ipv4 = ipv4Data.ip;
+
+                // IPv6 (se disponível)
+                let ipv6 = 'Não disponível';
+                try {
+                    const ipv6Response = await fetch('https://api64.ipify.org?format=json');
+                    const ipv6Data = await ipv6Response.json();
+                    ipv6 = ipv6Data.ip;
+                } catch (ipv6Err) {
+                    console.log('IPv6 não disponível:', ipv6Err);
+                }
+
+                // Geo via IP (usando IPv4)
+                const geoResponse = await fetch(`https://ipapi.co/${ipv4}/json/`);
+                const geoData = await geoResponse.json();
+
+                infoDiv.innerHTML = `
+                    <p><strong>IP Público (IPv4):</strong> ${ipv4}</p>
+                    <p><strong>IP Público (IPv6):</strong> ${ipv6}</p>
+                    <p><strong>Localização:</strong> ${geoData.city || 'N/A'}, ${geoData.region || 'N/A'}, ${geoData.country_name || 'N/A'}</p>
+                `;
+                infoDiv.classList.remove('loading');
+            } catch (err) {
+                infoDiv.innerHTML = '<p><strong>Erro ao carregar informações de rede. Verifique sua conexão.</strong></p>';
+                infoDiv.classList.remove('loading');
+                console.error('Erro no fetch de IP/Geo:', err);
+            }
+        }
+
         // Função para abrir o modal QR
         function openModal() {
             document.getElementById('qrModal').style.display = 'block';
@@ -387,16 +616,59 @@
             document.getElementById('qrModal').style.display = 'none';
         }
 
-        // Fechar modal ao clicar fora da imagem
+        // Função para abrir o modal Speed Test (agora com fetch de IP/Geo)
+        async function openSpeedtestModal() {
+            document.getElementById('speedtestModal').style.display = 'block';
+            await fetchIpInfo(); // Carrega as infos ao abrir o modal
+        }
+
+        // Função para fechar o modal Speed Test
+        function closeSpeedtestModal() {
+            document.getElementById('speedtestModal').style.display = 'none';
+        }
+
+        // Função para abrir o modal IndaiaFibra
+        function openIndaiaModal() {
+            document.getElementById('indaiaModal').style.display = 'block';
+        }
+
+        // Função para fechar o modal IndaiaFibra
+        function closeIndaiaModal() {
+            document.getElementById('indaiaModal').style.display = 'none';
+        }
+
+        // Fechar modais ao clicar fora do conteúdo
         window.onclick = function(event) {
-            const modal = document.getElementById('qrModal');
-            if (event.target == modal) {
+            const qrModal = document.getElementById('qrModal');
+            const stModal = document.getElementById('speedtestModal');
+            const indaiaModal = document.getElementById('indaiaModal');
+            if (event.target == qrModal) {
                 closeModal();
+            } else if (event.target == stModal) {
+                closeSpeedtestModal();
+            } else if (event.target == indaiaModal) {
+                closeIndaiaModal();
             }
         }
 
         // Animação adicional: Confetti ou partículas leves no load (opcional, mas para UX fun)
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', async function() {
+            // Detecta IP local e configura o botão de Gerenciar Host
+            const localIP = await getLocalIP();
+            const hostBtn = document.getElementById('hostBtn');
+            if (localIP) {
+                const parts = localIP.split('.');
+                const gateway = `${parts[0]}.${parts[1]}.${parts[2]}.1`;
+                hostBtn.href = `http://${gateway}/`;
+                hostBtn.innerHTML = `<i class="fas fa-desktop"></i> (${gateway}) Roteador`;
+                console.log(`Gateway detectado: ${gateway}`);
+            } else {
+                // Fallback para No-IP se não conseguir detectar
+                hostBtn.href = 'https://www.noip.com/pt-BR';
+                hostBtn.innerHTML = `<i class="fas fa-desktop"></i> Gerenciar Host (Fallback)`;
+                console.log('Não foi possível detectar o IP local. Usando fallback.');
+            }
+
             // Simples animação de partículas no header (usando CSS já aplicado)
             console.log('Página carregada com animações ativadas!');
         });
@@ -418,12 +690,66 @@
                     background: rgba(255,255,255,0.6);
                     border-radius: 50%;
                     transform: scale(0);
-                    animation: ripple 0.6s linear;
+                    animation: ripple 0.7s linear;
                     pointer-events: none;
                 `;
                 this.appendChild(ripple);
-                setTimeout(() => ripple.remove(), 600);
+                setTimeout(() => ripple.remove(), 700);
             });
+        });
+
+        // Adicionar ripple effect também no botão OOKLA
+        document.addEventListener('DOMContentLoaded', function() {
+            const ooklaBtn = document.querySelector('.ookla-button');
+            if (ooklaBtn) {
+                ooklaBtn.addEventListener('click', function(e) {
+                    const ripple = document.createElement('span');
+                    const rect = this.getBoundingClientRect();
+                    const size = Math.max(rect.width, rect.height);
+                    const x = e.clientX - rect.left - size / 2;
+                    const y = e.clientY - rect.top - size / 2;
+                    ripple.style.cssText = `
+                        position: absolute;
+                        width: ${size}px;
+                        height: ${size}px;
+                        left: ${x}px;
+                        top: ${y}px;
+                        background: rgba(255,255,255,0.6);
+                        border-radius: 50%;
+                        transform: scale(0);
+                        animation: ripple 0.7s linear;
+                        pointer-events: none;
+                    `;
+                    this.appendChild(ripple);
+                    setTimeout(() => ripple.remove(), 700);
+                });
+            }
+
+            // Adicionar ripple effect no botão externo IndaiaFibra
+            const indaiaBtn = document.querySelector('.indaia-external-button');
+            if (indaiaBtn) {
+                indaiaBtn.addEventListener('click', function(e) {
+                    const ripple = document.createElement('span');
+                    const rect = this.getBoundingClientRect();
+                    const size = Math.max(rect.width, rect.height);
+                    const x = e.clientX - rect.left - size / 2;
+                    const y = e.clientY - rect.top - size / 2;
+                    ripple.style.cssText = `
+                        position: absolute;
+                        width: ${size}px;
+                        height: ${size}px;
+                        left: ${x}px;
+                        top: ${y}px;
+                        background: rgba(255,255,255,0.6);
+                        border-radius: 50%;
+                        transform: scale(0);
+                        animation: ripple 0.7s linear;
+                        pointer-events: none;
+                    `;
+                    this.appendChild(ripple);
+                    setTimeout(() => ripple.remove(), 700);
+                });
+            }
         });
 
         // CSS para ripple
