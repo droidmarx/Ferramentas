@@ -1,0 +1,392 @@
+<!doctype html>
+
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Controle de Medicação — Cronograma</title>
+<style>
+:root{--bg:#f5f7fb;--card:#fff;--accent:#2b90f0;--ok:#28a745}
+body{font-family:Inter,Segoe UI,Arial,sans-serif;background:var(--bg);margin:0;padding:12px}
+.container{max-width:820px;margin:12px auto;padding:16px;background:var(--card);border-radius:12px;box-shadow:0 4px 16px rgba(0,0,0,0.06)}
+h1{margin:0 0 8px;font-size:18px}
+.topbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.btn{background:var(--accent);color:#fff;border:none;padding:6px 10px;border-radius:6px;cursor:pointer;font-size:13px}
+.small{font-size:12px;color:#555}
+.controls{display:flex;gap:6px;margin:8px 0;align-items:center;flex-wrap:wrap}
+#next{background:#fff3cd;border:1px solid #ffeeba;padding:8px;border-radius:6px;flex:1;min-width:200px}
+.event{display:flex;justify-content:space-between;align-items:center;padding:8px;border-radius:6px;margin-bottom:6px;border:1px solid #eee;background:#fff}
+.event.taken{opacity:0.5}
+.event .meta{display:flex;flex-direction:column;flex:1}
+.event .meta b{font-size:13px}
+.take{background:var(--ok);color:#fff;border:none;padding:4px 8px;border-radius:6px;cursor:pointer;font-size:11px}
+.filter{padding:6px;border-radius:6px;border:1px solid #ddd;font-size:12px}
+.legend{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+.legend span{background:#f0f7ff;padding:4px 6px;border-radius:4px;font-size:12px}
+.note{font-size:12px;color:#666;margin-top:8px}
+
+/* Timeline Styles */
+#timeline { margin: 16px 0; padding: 8px; background: #f8f9fa; border-radius: 6px; overflow-x: auto; white-space: nowrap; }
+.timeline-header { font-weight: bold; margin-bottom: 6px; color: #333; font-size: 13px; }
+.timeline-container { display: flex; gap: 2px; align-items: flex-start; }
+.timeline-date { 
+  min-width: 100px; padding: 6px; background: #fff; border: 1px solid #e9ecef; border-radius: 4px; text-align: center; flex: 0 0 auto; 
+}
+.timeline-date.today { border-color: var(--accent); background: #e3f2fd; }
+.timeline-date.past { opacity: 0.6; }
+.timeline-date .date-label { font-size: 11px; color: #666; margin-bottom: 2px; }
+.timeline-date .med-count { background: var(--accent); color: #fff; padding: 1px 4px; border-radius: 3px; font-size: 10px; }
+.timeline-date .med-list { font-size: 10px; margin-top: 2px; line-height: 1.1; max-height: 50px; overflow-y: auto; }
+.timeline-date.empty .med-count { background: #6c757d; }
+.med-toggle { display: flex; gap: 6px; align-items: center; margin: 6px 0; flex-wrap: wrap; }
+.med-toggle label { display: flex; align-items: center; gap: 3px; font-size: 12px; cursor: pointer; white-space: nowrap; }
+.med-toggle input[type="checkbox"] { width: 14px; height: 14px; }
+
+/* Responsivo */
+@media (max-width: 600px) {
+  body { padding: 8px; }
+  .container { margin: 8px auto; padding: 12px; }
+  .topbar { flex-direction: column; align-items: stretch; }
+  #next { min-width: auto; text-align: center; }
+  .controls { flex-direction: column; align-items: stretch; }
+  .filter { width: 100%; }
+  .btn { width: 100%; margin-top: 4px; }
+  .med-toggle { justify-content: flex-start; }
+  .legend { flex-direction: column; }
+  .timeline-date { min-width: 80px; padding: 4px; }
+  .timeline-date .date-label { font-size: 10px; }
+  .timeline-date .med-count { font-size: 9px; padding: 0 3px; }
+  .event { flex-direction: column; align-items: flex-start; gap: 6px; }
+  .event .meta { flex: none; }
+  .take { align-self: flex-end; }
+}
+</style>
+</head>
+<body>
+<div class="container">
+<h1>Controle de Medicação</h1>
+<div class="topbar">
+<div id="next">
+<div class="small">Próxima dose</div>
+<div id="nextLabel"><b>Carregando...</b></div>
+<div class="small" id="nextTime"></div>
+</div>
+<div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
+<button class="btn" id="showAll">Mostrar tudo</button>
+<button class="btn" id="showPending">Pendentes</button>
+</div>
+</div>
+<div class="controls">
+<input id="search" class="filter" placeholder="Buscar por medicamento" />
+<select id="filterMed" class="filter">
+<option value="">Filtrar por remédio</option>
+</select>
+<button id="clearTaken" class="btn">Limpar marcações</button>
+</div>
+<div class="med-toggle" id="medToggles"></div>
+<div class="legend small">
+<span><b>Tomar</b> — pressione <i>Tomado</i> quando administrar</span>
+<span><b>PRN</b> — usar somente se necessário</span>
+</div>
+<div id="timeline">
+<div class="timeline-header">Linha Cronológica (próximos 30 dias)</div>
+<div class="timeline-container" id="timelineContainer"></div>
+</div>
+<div id="list" style="margin-top:8px"></div>
+<div class="note">Este app funciona offline no navegador e salva o histórico no seu dispositivo. As doses marcadas ficam gravadas localmente. O status de ativação dos remédios também é salvo.</div>
+</div><script>
+// Agenda gerada (todos os horários) - Ajustado para 2025 para alinhar com data atual
+// --- Gerador automático de eventos ---
+const events = [];
+
+function addFixed(name, dose, notes, dates){ dates.forEach(dt=>events.push({label:name,dose,notes,dt})); }
+function rangeDays(start,end){ const out=[],d=new Date(start); while(d<=end){ out.push(new Date(d)); d.setDate(d.getDate()+1); } return out; }
+function formatISO(d,h){ return new Date(d.getFullYear(),d.getMonth(),d.getDate(),h,0).toISOString(); }
+
+// Amoxicilina 10 dias – 12/12h (ajustado para 2025)
+addFixed("Amoxicilina + Clavulanato","4.5 mL","12/12h",[
+  "2025-11-20T21:00:00",
+  ...rangeDays(new Date(2025,10,21), new Date(2025,10,29)).flatMap(d=>[
+    formatISO(d,9)
+  ]),
+  ...rangeDays(new Date(2025,10,21), new Date(2025,10,30)).flatMap(d=>[
+    formatISO(d,21)
+  ])
+]);
+
+// Ibuprofeno – até 25/11 – 8/8h
+addFixed("Ibuprofeno","4.5 mL","8/8h",[
+  "2025-11-20T21:00:00",
+  ...rangeDays(new Date(2025,10,21), new Date(2025,10,25)).flatMap(d=>[
+    formatISO(d,5), formatISO(d,13), formatISO(d,21)
+  ])
+]);
+
+// Prednisolona – 5 dias – 1x/dia 09h
+addFixed("Prednisolona","3 mL","1x/dia",rangeDays(new Date(2025,10,21), new Date(2025,10,25)).map(d=>formatISO(d,9)));
+
+// Unizinco – 10 dias – 1x/dia 09h
+addFixed("Unizinco","5 mL","1x/dia",rangeDays(new Date(2025,10,21), new Date(2025,10,30)).map(d=>formatISO(d,9)));
+
+// Becan LF – 30 dias – 09h
+addFixed("Becan LF","15 gotas","1x/dia",rangeDays(new Date(2025,10,21), new Date(2025,11,20)).map(d=>formatISO(d,9)));
+
+// Allegra – igual Amoxicilina
+addFixed("Allegra","2.5 mL","12/12h",[
+  "2025-11-20T21:00:00",
+  ...rangeDays(new Date(2025,10,21), new Date(2025,10,29)).flatMap(d=>[
+    formatISO(d,9)
+  ]),
+  ...rangeDays(new Date(2025,10,21), new Date(2025,10,30)).flatMap(d=>[
+    formatISO(d,21)
+  ])
+]);
+
+// Budesonida — fase 1 (21/11–05/12) 09h e 21h
+addFixed("Budesonida","1 jato por narina","2x/dia",[
+  ...rangeDays(new Date(2025,10,21), new Date(2025,11,5)).flatMap(d=>[
+    formatISO(d,9), formatISO(d,21)
+  ])
+]);
+// Budesonida — fase 2 (06/12–20/12) só 21h
+addFixed("Budesonida","1 jato por narina","1x/dia",rangeDays(new Date(2025,11,6), new Date(2025,11,20)).map(d=>formatISO(d,21)));
+
+// Sorine — 05h / 13h / 21h até 20/12
+addFixed("Sorine Infantil","1 jato por narina","8/8h",rangeDays(new Date(2025,10,20), new Date(2025,11,20)).flatMap(d=>[
+  formatISO(d,5), formatISO(d,13), formatISO(d,21)
+]));
+
+// PRN (sem hora)
+events.push({label:"Dipirona ou Paracetamol",dose:"13 gotas",notes:"SE necessário (dor/febre)",dt:null});
+events.push({label:"Ondansetrona",dose:"1 fita",notes:"SE necessário (vômitos)",dt:null});
+
+// Função corrigida para gerar ID estável baseado nas propriedades do evento (DJB2 hash corrigido)
+function generateStableId(e) {
+  const key = `${e.label}|${e.dose}|${e.notes}|${e.dt || 'PRN'}`;
+  let hash = 5381;
+  for (let i = 0; i < key.length; i++) {
+    const char = key.charCodeAt(i);
+    hash = ((hash << 5) + hash + char) >>> 0; /* hash * 33 + c */
+  }
+  return hash.toString(36).slice(0,9);
+}
+
+// convert dt strings to Date objects or keep null for PRN, and assign stable ID
+events.forEach(e=>{ 
+  if(e.dt) e.date = new Date(e.dt); 
+  else e.date = null; 
+  e.id = generateStableId(e);
+});
+
+// localStorage keys
+const LS_KEY_TAKEN = 'med_schedule_taken_v2'; // Increment version to clear old data
+const LS_KEY_STATUS = 'med_status_active_v1';
+let takenMap = JSON.parse(localStorage.getItem(LS_KEY_TAKEN) || '{}');
+let medStatus = JSON.parse(localStorage.getItem(LS_KEY_STATUS) || '{}'); // {medName: true/false} - true = ativo (tomando)
+
+const listEl = document.getElementById('list');
+const nextLabel = document.getElementById('nextLabel');
+const nextTime = document.getElementById('nextTime');
+const search = document.getElementById('search');
+const filterMed = document.getElementById('filterMed');
+const showAllBtn = document.getElementById('showAll');
+const showPendingBtn = document.getElementById('showPending');
+const clearBtn = document.getElementById('clearTaken');
+const medTogglesEl = document.getElementById('medToggles');
+const timelineContainer = document.getElementById('timelineContainer');
+
+// populate filter dropdown
+const meds = Array.from(new Set(events.map(e=>e.label)));
+meds.forEach(m=>{ const opt = document.createElement('option'); opt.value=m; opt.textContent=m; filterMed.appendChild(opt); });
+
+// Render toggles for med status
+function renderMedToggles() {
+  medTogglesEl.innerHTML = '<div class="small" style="flex-basis:100%; margin-bottom:3px;">Status dos Remédios:</div>';
+  meds.forEach(med => {
+    const label = document.createElement('label');
+    const checkbox = document.createElement('input');
+    checkbox.type = 'checkbox';
+    // Garante que o estado seja carregado corretamente do localStorage
+    const savedStatus = medStatus[med];
+    checkbox.checked = savedStatus === true || savedStatus === undefined; // default true if not set or undefined
+    checkbox.onchange = () => {
+      medStatus[med] = checkbox.checked;
+      saveStatus();
+      render(); // Re-render list
+      renderTimeline(); // Re-render timeline
+      updateNext(); // Update next
+    };
+    label.appendChild(checkbox);
+    label.appendChild(document.createTextNode(med));
+    medTogglesEl.appendChild(label);
+  });
+}
+
+function saveTaken() { localStorage.setItem(LS_KEY_TAKEN, JSON.stringify(takenMap)); }
+function saveStatus() { localStorage.setItem(LS_KEY_STATUS, JSON.stringify(medStatus)); }
+
+function isMedActive(med) {
+  const status = medStatus[med];
+  return status === true || status === undefined; // default active if not set
+}
+
+function renderTimeline() {
+  const now = new Date();
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  timelineContainer.innerHTML = '';
+  for (let i = 0; i < 31; i++) { // Próximos 30 dias + hoje
+    const date = new Date(today);
+    date.setDate(today.getDate() + i);
+    const dateStr = date.toISOString().split('T')[0];
+    const dayEvents = events.filter(e => 
+      e.date && 
+      new Date(e.date).toISOString().split('T')[0] === dateStr &&
+      !takenMap[e.id] &&
+      isMedActive(e.label)
+    );
+    const isToday = i === 0;
+    const isPast = date < today;
+    
+    const dateDiv = document.createElement('div');
+    dateDiv.className = `timeline-date ${isToday ? 'today' : ''} ${isPast ? 'past' : ''} ${dayEvents.length === 0 ? 'empty' : ''}`;
+    dateDiv.innerHTML = `
+      <div class="date-label">${formatDateShort(date)}</div>
+      <div class="med-count">${dayEvents.length} doses</div>
+      ${dayEvents.length > 0 ? `<div class="med-list">${dayEvents.map(e => e.label).join('<br>')}</div>` : ''}
+    `;
+    dateDiv.onclick = () => {
+      // Filter list to this date
+      search.value = '';
+      filterMed.value = '';
+      renderDay(dateStr);
+    };
+    timelineContainer.appendChild(dateDiv);
+  }
+}
+
+let currentFilterPending = false; // Track current filter state
+
+function renderDay(dateStr) {
+  currentFilterPending = false; // Day view shows all
+  // Similar to render, but filter by date
+  listEl.innerHTML = '';
+  const targetDate = new Date(dateStr + 'T00:00:00');
+  let dayEvents = events.filter(e => 
+    e.date && 
+    new Date(e.date).toDateString() === targetDate.toDateString() &&
+    isMedActive(e.label)
+  ).sort((a,b) => new Date(a.date) - new Date(b.date));
+  
+  if (dayEvents.length === 0) {
+    listEl.innerHTML = '<div class="small">Nenhum evento para esta data</div>';
+    return;
+  }
+  
+  dayEvents.forEach(e => renderEvent(e, div => listEl.appendChild(div)));
+}
+
+function render(filterPending=false){
+  currentFilterPending = filterPending;
+  listEl.innerHTML='';
+  const q = search.value.trim().toLowerCase();
+  let items = events.slice().filter(e=>{
+    if (!isMedActive(e.label)) return false; // Skip inactive meds
+    if(q && !e.label.toLowerCase().includes(q)) return false;
+    const f = filterMed.value;
+    if(f && e.label !== f) return false;
+    if(filterPending && e.date){ // only upcoming and not taken
+      const now = new Date();
+      if(e.date < new Date(now.getFullYear(), now.getMonth(), now.getDate()-1)) return false; // hide too old
+      if(takenMap[e.id]) return false;
+    }
+    return true;
+  });
+  // sort: null (PRN) go to end, else by date
+  items.sort((a,b)=>{ if(!a.date && !b.date) return 0; if(!a.date) return 1; if(!b.date) return -1; return new Date(a.date)-new Date(b.date); });
+
+  if(items.length===0){ listEl.innerHTML='<div class="small">Nenhum evento encontrado</div>'; return; }
+
+  items.forEach(e => renderEvent(e, div => listEl.appendChild(div)));
+}
+
+function renderEvent(e, appendFn) {
+  const div = document.createElement('div'); div.className='event';
+  if(takenMap[e.id]) div.classList.add('taken');
+  const meta = document.createElement('div'); meta.className='meta';
+  const title = document.createElement('div'); title.innerHTML = `<b>${e.label}</b> — ${e.dose}`;
+  const sub = document.createElement('div'); sub.className='small';
+  sub.textContent = e.notes + (e.date?(' • '+formatDate(e.date)):' • PRN');
+  meta.appendChild(title); meta.appendChild(sub);
+
+  const right = document.createElement('div');
+  if(e.date){
+    const when = document.createElement('div'); when.className='small'; when.textContent = formatDate(e.date, true);
+    right.appendChild(when);
+  }
+  const btn = document.createElement('button'); btn.className='take'; btn.textContent = takenMap[e.id]? 'Tomado' : 'Tomar';
+  btn.onclick = ()=>{ 
+    if(takenMap[e.id]){ 
+      delete takenMap[e.id]; 
+      btn.textContent='Tomar'; 
+      div.classList.remove('taken'); 
+    } else { 
+      takenMap[e.id] = {at: new Date().toISOString()}; 
+      btn.textContent='Tomado'; 
+      div.classList.add('taken'); 
+    }
+    saveTaken(); 
+    updateNext(); 
+    renderTimeline(); // Update timeline
+    if (currentFilterPending) {
+      render(currentFilterPending);
+    } else {
+      renderDay(new Date(e.date).toISOString().split('T')[0]);
+    }
+  };
+  right.appendChild(btn);
+
+  div.appendChild(meta); div.appendChild(right);
+  appendFn(div);
+}
+
+function formatDate(d, showTimeOnly=false){
+  if(!d) return '';
+  const dt = new Date(d);
+  const day = String(dt.getDate()).padStart(2,'0');
+  const month = String(dt.getMonth()+1).padStart(2,'0');
+  const year = dt.getFullYear();
+  const hh = String(dt.getHours()).padStart(2,'0');
+  const mm = String(dt.getMinutes()).padStart(2,'0');
+  return showTimeOnly ? `${hh}:${mm}` : `${day}/${month}/${year} ${hh}:${mm}`;
+}
+
+function formatDateShort(d) {
+  const dt = new Date(d);
+  const day = String(dt.getDate()).padStart(2,'0');
+  const month = String(dt.getMonth()+1).padStart(2,'0');
+  return `${day}/${month}`;
+}
+
+function updateNext(){
+  const now = new Date();
+  const upcoming = events.filter(e=>e.date && new Date(e.date) >= now && !takenMap[e.id] && isMedActive(e.label)).sort((a,b)=>new Date(a.date)-new Date(b.date));
+  if(upcoming.length===0){ nextLabel.innerHTML = '<b>Nenhuma próxima dose agendada</b>'; nextTime.textContent=''; return; }
+  const n = upcoming[0];
+  nextLabel.innerHTML = `<b>${n.label} — ${n.dose}</b>`;
+  nextTime.textContent = formatDate(n.date);
+}
+
+search.addEventListener('input', ()=>render(currentFilterPending));
+filterMed.addEventListener('change', ()=>render(currentFilterPending));
+showAllBtn.onclick = ()=>{ render(false); };
+showPendingBtn.onclick = ()=>{ render(true); };
+clearBtn.onclick = ()=>{ if(confirm('Remover todas as marcações de "Tomado"?')){ takenMap={}; saveTaken(); render(currentFilterPending); updateNext(); renderTimeline(); } };
+
+// initial
+renderMedToggles();
+updateNext(); 
+render(false);
+renderTimeline();
+
+</script></body>
+</html>
